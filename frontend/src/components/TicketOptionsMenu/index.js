@@ -10,6 +10,7 @@ import ConfirmationModal from "../ConfirmationModal";
 import TransferTicketModal from "../TransferTicketModal";
 import DeletePeoplesModal from "../DeletePeoplesModal";
 import SelectAdminModal from "../SelectAdminModal";
+import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
 import { Can } from "../Can";
 import { AuthContext } from "../../context/Auth/AuthContext";
@@ -24,9 +25,10 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 	const isMounted = useRef(true);
 	const { user } = useContext(AuthContext);
 	const numberOfGroup = history.location.pathname.split('/')[2];
+	// console.log(ticket);
 
 	useEffect(() => {
-		return () => {
+		return async () => {
 			isMounted.current = false;
 		};
 	}, []);
@@ -71,7 +73,7 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 		await api.put('/group/onlyAdmin', {
 			chatID: `${number}@g.us`
 		})
-		window.location.reload();
+		toast.success('Agora só quem fala são os admins!');
 	}
 
 	const handleCloseDeletePeoplesModal = () => {
@@ -116,15 +118,21 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 						</MenuItem>
 					)}
 				/>
-				<MenuItem onClick={handleOpenDeletePeoplesModal}>
-					Remover pessoas
-				</MenuItem>
-				<MenuItem onClick={handleOpenSelectAdminModal}>
-					Tornas pessoas admins
-				</MenuItem>
-				<MenuItem onClick={handleOnlyAdm}>
-					Bloquear só para administradores falarem
-				</MenuItem>
+				{ticket.isGroup && (
+					<MenuItem onClick={handleOpenDeletePeoplesModal}>
+						Remover pessoas
+					</MenuItem>
+				)}
+				{ticket.isGroup && (
+					<MenuItem onClick={handleOpenSelectAdminModal}>
+						Tornas pessoas admins
+					</MenuItem>
+				)}
+				{ticket.isGroup && (
+					<MenuItem onClick={handleOnlyAdm}>
+						Bloquear só para administradores falarem
+					</MenuItem>
+				)}
 			</Menu>
 			<ConfirmationModal
 				title={`${i18n.t("ticketOptionsMenu.confirmationModal.title")}${

@@ -82,6 +82,7 @@ const Ticket = () => {
   const [loading, setLoading] = useState(true);
   const [contact, setContact] = useState({});
   const [ticket, setTicket] = useState({});
+	const [isGroup, setIsGroup] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -89,7 +90,10 @@ const Ticket = () => {
       const fetchTicket = async () => {
         try {
           const { data } = await api.get("/tickets/" + ticketId);
-
+					// console.log(data)
+					// if (data.isGroup) {
+					// 	setIsGroup(true);
+					// }
           setContact(data.contact);
           setTicket(data);
           setLoading(false);

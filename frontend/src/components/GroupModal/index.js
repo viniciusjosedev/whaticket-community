@@ -92,9 +92,10 @@ const GroupModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 				integer,
 				isGroup
 			});
-			console.log(create);
+			// console.log(create);
 			setLoading(false);
 			onSave(create.data)
+			toast.success('Grupo criado!')
 			onClose();
 		}
 		catch (error) {

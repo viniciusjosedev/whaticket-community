@@ -13,6 +13,8 @@ import Autocomplete, {
 } from "@material-ui/lab/Autocomplete";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
+import { toast } from "react-toastify";
+
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
@@ -83,6 +85,7 @@ const SelectAdminModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) =>
 			chatID: `${number}@g.us`,
 			peoples: listSelectd
 		})
+		toast.success('Essas pessoas agora são admin!')
 		handleClose();
 	}
 

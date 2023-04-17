@@ -13,10 +13,12 @@ import Autocomplete, {
 } from "@material-ui/lab/Autocomplete";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
+import { toast } from "react-toastify";
+
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
-import toastError from "../../errors/toastError";
+// import toastError from "../../errors/toastError";
 
 const filterOptions = createFilterOptions({
 	trim: true,
@@ -28,7 +30,7 @@ const DeletePeoplesModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) 
 	const [loading, setLoading] = useState(false);
 	const [searchParam, setSearchParam] = useState("");
 	const [listSelectd, setListSelectd] = useState([])
-	console.log(listSelectd)
+	// console.log(listSelectd)
 	const numberOfGroup = history.location.pathname.split('/')[2];
 
 	useEffect(() => {
@@ -84,6 +86,7 @@ const DeletePeoplesModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) 
 			chatID: `${number}@g.us`,
 			peoples: listSelectd
 		})
+		toast.success('Pessoas expulsas!')
 		handleClose();
 	}
 
