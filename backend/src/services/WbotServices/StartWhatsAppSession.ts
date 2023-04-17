@@ -1,4 +1,4 @@
-import { initWbot, createGroups } from "../../libs/wbot";
+import { initWbot } from "../../libs/wbot";
 import Whatsapp from "../../models/Whatsapp";
 import { wbotMessageListener } from "./wbotMessageListener";
 import { getIO } from "../../libs/socket";
@@ -20,10 +20,6 @@ export const StartWhatsAppSession = async (
     const wbot = await initWbot(whatsapp);
     wbotMessageListener(wbot);
     wbotMonitor(wbot, whatsapp);
-
-    // const teste = await wbot.getChatById("120363141414214935@g.us");
-    // const teste2 = await teste.removeParticipants(["558191550920@c.us"]);
-    // console.log(teste2);
   } catch (err) {
     logger.error(err);
   }
