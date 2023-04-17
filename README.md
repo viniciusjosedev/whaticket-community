@@ -1,4 +1,4 @@
-#OBSERVAÇÃO
+# OBSERVAÇÃO
 ## ASSIM QUE TERMINAR DE INSTALAR AS DEPENDÊNCIAS NA PASTA "backend", FAZER A SEGUINTE ALTERAÇÃO:
 ### ir para backend/node_modules/whatsapp-web-js/src/util/injected.js
 ### procurar por: window.Store.GroupParticipants = window.mR.findModule('promoteParticipants')[1];
