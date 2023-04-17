@@ -1,3 +1,9 @@
+#OBSERVAÇÃO
+## ASSIM QUE TERMINAR DE INSTALAR AS DEPENDÊNCIAS NA PASTA "backend", FAZER A SEGUINTE ALTERAÇÃO:
+### ir para backend/node_modules/whatsapp-web-js/src/util/injected.js
+### procurar por: window.Store.GroupParticipants = window.mR.findModule('promoteParticipants')[1];
+### substutuir por: window.Store.GroupParticipants = window.mR.findModule('promoteParticipants')[0];
+
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?business=VWW3BHW4AWHUY&item_name=Desenvolvimento+de+Software&currency_code=BRL)
 [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B21084%2Fgithub.com%2Fcanove%2Fwhaticket.svg?type=shield)](https://app.fossa.com/projects/custom%2B21084%2Fgithub.com%2Fcanove%2Fwhaticket?ref=badge_shield)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=canove_whaticket&metric=alert_status)](https://sonarcloud.io/dashboard?id=canove_whaticket)
