@@ -18,8 +18,8 @@ const CreateGroupService = async (
 
   try {
     const retorno = await wbot.createGroup(nameGroup, peoples);
-		const filter = Object.entries(retorno.gid).filter(e => e[0] === 'user');
-		console.log(filter)
+		const filter = Object.entries(retorno.gid).filter(e => e[0] === 'user')[0];
+		console.log(filter[1])
 		return `${filter[1]}`;
   } catch (err) {
     if (err.message === "invalidNumber") {
