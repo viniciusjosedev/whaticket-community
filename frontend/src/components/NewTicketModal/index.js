@@ -58,8 +58,8 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 					}
 					if (choiceInput !== 'ticket' && listSelectd.length > 0) {
 						const filterSelectd = listSelectd.map(e => e.split('@')[0])
-						console.log(filterSelectd)
-						console.log(filter[0].number)
+						// console.log(filterSelectd)
+						// console.log(filter[0].number)
 						filter = filter.filter((e, i) => !(filterSelectd.includes(e.number)));
 					}
 					// console.log(listSelectd)
