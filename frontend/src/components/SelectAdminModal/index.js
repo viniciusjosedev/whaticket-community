@@ -51,9 +51,10 @@ const SelectAdminModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) =>
 				}	else {contacts = data.contacts}
 				const { data: { contact: { number } } } = await api.get(`/tickets/${numberOfGroup}`)
 				const { data: { groupMetadata: { participants } } } = await api.get(`/group/${number}@g.us`)
-				// console.log(contacts)
-				// console.log(participants)
-				const filter = participants.filter((e, i) => Number(e.id.user) === Number(contacts[i > contacts.length - 1 ? contacts.length - 1 : i].number));
+				// const teste = await api.get(`/group/${number}@g.us`)
+				// console.log(teste)
+				const filterParticipants = participants.filter(e => !e.isAdmin)
+				const filter = filterParticipants.filter((e, i) => Number(e.id.user) === Number(contacts[i > contacts.length - 1 ? contacts.length - 1 : i].number));
 				// console.log(filter);
 				let filter2 = []
 				filter.forEach(e => {
@@ -86,6 +87,7 @@ const SelectAdminModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) =>
 			peoples: listSelectd
 		})
 		toast.success('Essas pessoas agora são admin!')
+    setListSelectd([]);
 		handleClose();
 	}
 

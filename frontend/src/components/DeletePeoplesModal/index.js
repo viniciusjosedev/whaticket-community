@@ -87,6 +87,7 @@ const DeletePeoplesModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) 
 			peoples: listSelectd
 		})
 		toast.success('Pessoas expulsas!')
+		setListSelectd([]);
 		handleClose();
 	}
 
