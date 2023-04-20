@@ -76,6 +76,7 @@ const DeletePeoplesModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) 
 	}, [searchParam, modalOpen]);
 
 	const handleClose = () => {
+		setListSelectd([])
 		onClose();
 		setSearchParam("");
 	};
