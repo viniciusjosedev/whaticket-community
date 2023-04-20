@@ -56,10 +56,13 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 					if (choiceInput !== 'ticket') {
 						filter = data.contacts.filter((e, i) => e.isGroup === false)
 					}
-					if (choiceInput !== 'ticket' && options.length > 0) {
-						filter = filter.filter((e, i) => e.number !== options[i].number);
+					if (choiceInput !== 'ticket' && listSelectd.length > 0) {
+						const filterSelectd = listSelectd.map(e => e.split('@')[0])
+						console.log(filterSelectd)
+						console.log(filter[0].number)
+						filter = filter.filter((e, i) => !(filterSelectd.includes(e.number)));
 					}
-					// console.log(filter)
+					// console.log(listSelectd)
 					setOptions(filter);
 					setLoading(false);
 				} catch (err) {
