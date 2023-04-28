@@ -124,7 +124,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 		if (newValue?.number && !listSelectd.some(e => e.number === newValue.number)) {
 			setListSelectd([...listSelectd, `${newValue.number}@c.us`]);
 			setSearchParam("");
-			if(newValue.notification === undefined) toast.success('Contato adicionado ao grupo com sucesso!')
+			if(newValue.notification === undefined) toast.success('Contato adicionado a lista do grupo com sucesso!')
 		}
 		else if (newValue?.name) {
 			setNewContactForGroup({ name: newValue.name });
