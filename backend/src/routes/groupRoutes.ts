@@ -16,6 +16,8 @@ groupRoutes.put("/group/remove", isAuth, GroupController.groupRemove);
 
 groupRoutes.put("/group/promoveAdmin", isAuth, GroupController.promoveAdmin);
 
+groupRoutes.put("/group/removeAdmin", isAuth, GroupController.removeAdmin);
+
 groupRoutes.put("/group/addPeoples", isAuth, GroupController.addParticipants);
 
 groupRoutes.put("/group/onlyAdmin", isAuth, GroupController.onlyAdmin);

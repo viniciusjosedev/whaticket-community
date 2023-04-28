@@ -81,6 +81,19 @@ export const promoveAdmin = async (
   return res.status(200).json({ status: "OK" });
 };
 
+export const removeAdmin = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const data: RemoveData = req.body;
+
+  const wbot = await GetChatById(data.chatID);
+
+  await wbot.demoteParticipants(data.peoples);
+
+  return res.status(200).json({ status: "OK" });
+};
+
 export const addParticipants = async (
   req: Request,
   res: Response
@@ -93,6 +106,7 @@ export const addParticipants = async (
 
   return res.status(200).json({ status: "OK" });
 };
+
 
 export const onlyAdmin = async (
   req: Request,
