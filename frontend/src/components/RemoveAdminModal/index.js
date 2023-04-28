@@ -23,7 +23,7 @@ const filterOptions = createFilterOptions({
 	trim: true,
 });
 
-const SelectAdminModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) => {
+const RemoveAdminModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) => {
 	const history = useHistory();
 	const [options, setOptions] = useState([]);
 	const [loading, setLoading] = useState(false);
@@ -53,7 +53,7 @@ const SelectAdminModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) =>
 				const { data: { groupMetadata: { participants } } } = await api.get(`/group/${number}@g.us`)
 				// const teste = await api.get(`/group/${number}@g.us`)
 				// console.log(teste)
-				const filterParticipants = participants.filter(e => !e.isAdmin)
+				const filterParticipants = participants.filter(e => e.isAdmin)
 				const filter = filterParticipants.filter((e, i) => Number(e.id.user) === Number(contacts[i > contacts.length - 1 ? contacts.length - 1 : i].number));
 				// console.log(filter);
 				let filter2 = []
@@ -83,11 +83,11 @@ const SelectAdminModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) =>
 
 	const handleAdmin = async () => {
 		const { data: { contact: { number } } } = await api.get(`/tickets/${numberOfGroup}`)
-		await api.put('/group/promoveAdmin', {
+		await api.put('/group/removeAdmin', {
 			chatID: `${number}@g.us`,
 			peoples: listSelectd
 		})
-		toast.success('Essa(s) pessoa(s) agora é(são) admin!')
+		toast.success('Essas pessoas deixaram de ser admin!')
     setListSelectd([]);
 		handleClose();
 	}
@@ -102,7 +102,7 @@ const SelectAdminModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) =>
 	return (
 		<Dialog open={modalOpen} onClose={handleClose} maxWidth="lg" scroll="paper">
 				<DialogTitle id="form-dialog-title">
-					Tornar pessoas admin
+					Remover pessoas admin
 				</DialogTitle>
 				<DialogContent dividers>
 					<Autocomplete
@@ -156,11 +156,11 @@ const SelectAdminModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) =>
 						disabled={ loading || !listSelectd.length > 0 }
 						loading={loading}
 					>
-						Tornar Admin
+						Remover Admin
 					</ButtonWithSpinner>
 				</DialogActions>
 		</Dialog>
 	);
 };
 
-export default SelectAdminModal;
+export default RemoveAdminModal;

@@ -85,15 +85,23 @@ const AddPeoplesModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) => 
 		setSearchParam("");
 	};
 
-	const handleExpulse = async () => {
+	const handleAdd = async () => {
 		const { data: { contact: { number } } } = await api.get(`/tickets/${numberOfGroup}`)
-		await api.put('/group/addPeoples', {
+		const { data } = await api.put('/group/addPeoples', {
 			chatID: `${number}@g.us`,
 			peoples: listSelectd
-		})
-		toast.success('Pessoas Adicionadas!')
-		setListSelectd([]);
-		handleClose();
+		});
+		// console.log(data)
+		if (data.type === 'ERROR_NUMBER') {
+			toast.error('Algo deu errado! Verifique o(s) número(s)!')
+			setListSelectd([]);
+			handleClose();
+		}
+		else {
+			toast.success('Pessoa(s) Adicionada(s)!')
+			setListSelectd([]);
+			handleClose();
+		}
 	}
 
 	const handleListSelectd = async (e, newValue) => {
@@ -255,7 +263,7 @@ const AddPeoplesModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) => 
 							variant="contained"
 							type="button"
 							color="primary"
-							onClick={ handleExpulse }
+							onClick={ handleAdd }
 							disabled={ loading || !listSelectd.length > 0 }
 							loading={loading}
 						>

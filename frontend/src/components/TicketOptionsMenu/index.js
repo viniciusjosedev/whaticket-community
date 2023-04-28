@@ -4,6 +4,8 @@ import { useHistory } from "react-router-dom";
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
 
+import Swal from 'sweetalert2';
+
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
@@ -15,7 +17,7 @@ import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
 import { Can } from "../Can";
 import { AuthContext } from "../../context/Auth/AuthContext";
-
+import RemoveAdminModal from "../RemoveAdminModal";
 
 const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 	const history = useHistory();
@@ -25,6 +27,7 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 	const [deletePeoplesModal, setDeletePeoplesModal] = useState(false);
 	const [addPeoplesModal, setAddPeoplesModal] = useState(false);
 	const [selectAdminModal, setSelectAdminModal] = useState(false);
+	const [removeAdminModal, setRemoveAdminModal] = useState(false);
 	const [isAdmin, setIsAdmin] = useState(false);
 	const isMounted = useRef(true);
 	const { user } = useContext(AuthContext);
@@ -82,6 +85,11 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 		handleClose();
 	};
 
+	const handleOpenRemoveAdminModal = e => {
+		setRemoveAdminModal(true);
+		handleClose();
+	};
+
 	const handleCloseTransferTicketModal = () => {
 		if (isMounted.current) {
 			setTransferTicketModalOpen(false);
@@ -97,6 +105,7 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 		})
 		if (onlyAdminMenssage) toast.success('Agora só quem fala são os admins!');
 		else toast.success('Agora todos podem falar!');
+		handleClose();
 	}
 
 	const handleCloseDeletePeoplesModal = () => {
@@ -116,6 +125,16 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 			setSelectAdminModal(false);
 		}
 	};
+
+	const handleRemoveAdminModal = () => {
+		if (isMounted.current) {
+			setRemoveAdminModal(false);
+		}
+	};
+
+	const alertWarning = () => {
+		toast.warning('Vefique se todos os contatos do grupo estão salvos na lista de contatos!');;
+	}
 
 	return (
 		<>
@@ -153,13 +172,27 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 					</MenuItem>
 				)}
 				{isAdmin && (
-					<MenuItem onClick={handleOpenDeletePeoplesModal}>
+					<MenuItem onClick={() => {
+						handleOpenDeletePeoplesModal()
+						alertWarning();	
+					}}>
 						Remover pessoas
 					</MenuItem>
 				)}
 				{isAdmin && (
-					<MenuItem onClick={handleOpenSelectAdminModal}>
+					<MenuItem onClick={() => {
+						handleOpenSelectAdminModal()
+						alertWarning();
+					}}>
 						Tornas pessoas admins
+					</MenuItem>
+				)}
+				{isAdmin && (
+					<MenuItem onClick={() => {
+						handleOpenRemoveAdminModal()
+						alertWarning();
+					}}>
+						Remover pessoas admins
 					</MenuItem>
 				)}
 				{isAdmin && (
@@ -206,6 +239,12 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 			<SelectAdminModal
 				modalOpen={selectAdminModal}
 				onClose={handleSelectAdminModal}
+				ticketid={ticket.id}
+				ticketWhatsappId={ticket.whatsappId}
+			/>
+			<RemoveAdminModal
+				modalOpen={removeAdminModal}
+				onClose={handleRemoveAdminModal}
 				ticketid={ticket.id}
 				ticketWhatsappId={ticket.whatsappId}
 			/>
