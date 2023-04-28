@@ -6,6 +6,7 @@ import CreateContactService from "../services/ContactServices/CreateContactServi
 import CreateGroupService from "../services/WbotServices/CreateGroupService";
 import RemovePeopleGroupService from "../services/WbotServices/RemovePeopleGroupService";
 import GetChatById from "../services/WbotServices/GetChatById";
+import GetInfo from "../services/WbotServices/GetInfo";
 // import GetProfilePicUrl from "../services/WbotServices/GetProfilePicUrl";
 
 interface ContactData {
@@ -58,6 +59,7 @@ export const groupRemove = async (
 ): Promise<Response> => {
   const data: RemoveData = req.body;
   // console.log(data);
+  console.log("teste infinito");
 
   const wbot = await GetChatById(data.chatID);
 
@@ -75,6 +77,19 @@ export const promoveAdmin = async (
   const wbot = await GetChatById(data.chatID);
 
   await wbot.promoteParticipants(data.peoples);
+
+  return res.status(200).json({ status: "OK" });
+};
+
+export const addParticipants = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const data: RemoveData = req.body;
+
+  const wbot = await GetChatById(data.chatID);
+
+  await wbot.addParticipants(data.peoples);
 
   return res.status(200).json({ status: "OK" });
 };
@@ -100,6 +115,16 @@ export const getDados = async (
   // console.log("number", number);
 
   const wbot = await GetChatById(number);
+  // console.log(wbot);
 
+  return res.status(200).json(wbot);
+};
+
+export const getPessoalNumber = async (
+  _req: Request,
+  res: Response
+): Promise<any> => {
+  // console.log("teste infinito");
+  const wbot = await GetInfo();
   return res.status(200).json(wbot);
 };

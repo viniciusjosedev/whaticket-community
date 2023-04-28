@@ -9,11 +9,13 @@ import api from "../../services/api";
 import ConfirmationModal from "../ConfirmationModal";
 import TransferTicketModal from "../TransferTicketModal";
 import DeletePeoplesModal from "../DeletePeoplesModal";
+import AddPeoplesModal from "../AddPeoplesModal";
 import SelectAdminModal from "../SelectAdminModal";
 import { toast } from "react-toastify";
 import toastError from "../../errors/toastError";
 import { Can } from "../Can";
 import { AuthContext } from "../../context/Auth/AuthContext";
+
 
 const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 	const history = useHistory();
@@ -21,7 +23,9 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 	const [confirmationOpen, setConfirmationOpen] = useState(false);
 	const [transferTicketModalOpen, setTransferTicketModalOpen] = useState(false);
 	const [deletePeoplesModal, setDeletePeoplesModal] = useState(false);
+	const [addPeoplesModal, setAddPeoplesModal] = useState(false);
 	const [selectAdminModal, setSelectAdminModal] = useState(false);
+	const [isAdmin, setIsAdmin] = useState(false);
 	const isMounted = useRef(true);
 	const { user } = useContext(AuthContext);
 	const numberOfGroup = history.location.pathname.split('/')[2];
@@ -32,6 +36,18 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 			isMounted.current = false;
 		};
 	}, []);
+
+	useEffect(() => {
+		async function init() {
+			if (ticket.isGroup) {
+				const { data: { user } } = await api.get('/group/info');
+				const { data: { groupMetadata: { participants } } } = await api.get(`/group/${ticket.contact.number}@g.us`)
+				const find = participants.find(e => e.isSuperAdmin)
+				if (Number(user) === Number(find.id.user)) setIsAdmin(true);
+		  }
+		}
+		init();
+	}, [ticket])
 
 	const handleDeleteTicket = async () => {
 		try {
@@ -56,6 +72,11 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 		handleClose();
 	};
 
+	const handleOpenAddPeoplesModal = e => {
+		setAddPeoplesModal(true);
+		handleClose();
+	};
+
 	const handleOpenSelectAdminModal = e => {
 		setSelectAdminModal(true);
 		handleClose();
@@ -67,18 +88,26 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 		}
 	};
 
-	const handleOnlyAdm = async () => {
+	const handleOnlyAdm = async (onlyAdminMenssage = true) => {
 		const { data: { contact: { number } }, data } = await api.get(`/tickets/${numberOfGroup}`)
 		// console.log(data);
 		await api.put('/group/onlyAdmin', {
-			chatID: `${number}@g.us`
+			chatID: `${number}@g.us`,
+			onlyAdminMenssage
 		})
-		toast.success('Agora só quem fala são os admins!');
+		if (onlyAdminMenssage) toast.success('Agora só quem fala são os admins!');
+		else toast.success('Agora todos podem falar!');
 	}
 
 	const handleCloseDeletePeoplesModal = () => {
 		if (isMounted.current) {
 			setDeletePeoplesModal(false);
+		}
+	};
+
+	const handleCloseAddPeoplesModal = () => {
+		if (isMounted.current) {
+			setAddPeoplesModal(false);
 		}
 	};
 
@@ -118,19 +147,29 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 						</MenuItem>
 					)}
 				/>
-				{ticket.isGroup && (
+				{isAdmin && (
+					<MenuItem onClick={handleOpenAddPeoplesModal}>
+						Adicionar pessoas
+					</MenuItem>
+				)}
+				{isAdmin && (
 					<MenuItem onClick={handleOpenDeletePeoplesModal}>
 						Remover pessoas
 					</MenuItem>
 				)}
-				{ticket.isGroup && (
+				{isAdmin && (
 					<MenuItem onClick={handleOpenSelectAdminModal}>
 						Tornas pessoas admins
 					</MenuItem>
 				)}
-				{ticket.isGroup && (
+				{isAdmin && (
 					<MenuItem onClick={handleOnlyAdm}>
 						Bloquear só para administradores falarem
+					</MenuItem>
+				)}
+				{isAdmin && (
+					<MenuItem onClick={() => handleOnlyAdm(false)}>
+						Desbloquar para todos falarem
 					</MenuItem>
 				)}
 			</Menu>
@@ -149,6 +188,12 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 			<TransferTicketModal
 				modalOpen={transferTicketModalOpen}
 				onClose={handleCloseTransferTicketModal}
+				ticketid={ticket.id}
+				ticketWhatsappId={ticket.whatsappId}
+			/>
+			<AddPeoplesModal
+				modalOpen={addPeoplesModal}
+				onClose={handleCloseAddPeoplesModal}
 				ticketid={ticket.id}
 				ticketWhatsappId={ticket.whatsappId}
 			/>

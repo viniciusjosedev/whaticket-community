@@ -61,7 +61,7 @@ const ContactSchema = Yup.object().shape({
 	email: Yup.string().email("Invalid email"),
 });
 
-const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
+const ContactModalForGroup = ({ open, onClose, contactId, initialValues, onSave }) => {
 	const classes = useStyles();
 	const isMounted = useRef(true);
 
@@ -274,4 +274,4 @@ const ContactModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 	);
 };
 
-export default ContactModal;
+export default ContactModalForGroup;

@@ -6,6 +6,8 @@ import * as GroupController from "../controllers/GroupController";
 
 const groupRoutes = express.Router();
 
+groupRoutes.get("/group/info", isAuth, GroupController.getPessoalNumber);
+
 groupRoutes.get("/group/:number", isAuth, GroupController.getDados);
 
 groupRoutes.post("/group", isAuth, GroupController.store);
@@ -13,6 +15,8 @@ groupRoutes.post("/group", isAuth, GroupController.store);
 groupRoutes.put("/group/remove", isAuth, GroupController.groupRemove);
 
 groupRoutes.put("/group/promoveAdmin", isAuth, GroupController.promoveAdmin);
+
+groupRoutes.put("/group/addPeoples", isAuth, GroupController.addParticipants);
 
 groupRoutes.put("/group/onlyAdmin", isAuth, GroupController.onlyAdmin);
 

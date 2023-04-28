@@ -13,13 +13,18 @@ import Autocomplete, {
 } from "@material-ui/lab/Autocomplete";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
+import { toast } from "react-toastify";
+
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import ContactModal from "../ContactModal";
+import ContactModalForGroup from "../ContactModalForGroup";
 import GroupModal from "../GroupModal";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
+
+import AddIcon from "@material-ui/icons/Add";
 
 const filter = createFilterOptions({
 	trim: true,
@@ -33,12 +38,15 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 	const [searchParam, setSearchParam] = useState("");
 	const [selectedContact, setSelectedContact] = useState(null);
 	const [newContact, setNewContact] = useState({});
+	const [newContactForGroup, setNewContactForGroup] = useState({});
 	const [contactModalOpen, setContactModalOpen] = useState(false);
+	const [contactModalForGroupOpen, setContactModalForGroupOpen] = useState(false);
 	const [groupModalOpen, setGroupModalOpen] = useState(false);
 	const [choiceInput, setChoiceInput] = useState('ticket');
   const [listSelectd, setListSelectd] = useState([])
+	const [openTextBox, setOpenTextBox] = useState(false);
+	const [isHovering, setIsHovering] = useState(false);
 	const { user } = useContext(AuthContext);
-	// console.log(listSelectd)
 
 	useEffect(() => {
 		if (!modalOpen || searchParam.length < 3) {
@@ -101,7 +109,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 	};
 
 	const handleSelectOption = (e, newValue) => {
-		// console.log(newValue)
+		console.log(newValue)
 		if (newValue?.number) {
 			setSelectedContact(newValue);
 		} 
@@ -115,11 +123,22 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 		// console.log(newValue)
 		if (newValue?.number && !listSelectd.some(e => e.number === newValue.number)) {
 			setListSelectd([...listSelectd, `${newValue.number}@c.us`]);
+			setSearchParam("");
+			if(newValue.notification === undefined) toast.success('Contato adicionado ao grupo com sucesso!')
+		}
+		else if (newValue?.name) {
+			setNewContactForGroup({ name: newValue.name });
+			setSearchParam("");
+			setContactModalForGroupOpen(true);
 		}
 	}
 
 	const handleCloseContactModal = () => {
 		setContactModalOpen(false);
+	};
+
+	const handleCloseContactForGroupModal = () => {
+		setContactModalForGroupOpen(false);
 	};
 
 	const handleCloseGroupModal = () => {
@@ -165,6 +184,12 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 				initialValues={listSelectd}
 				onClose={handleCloseGroupModal}
 				onSave={handleAddNewContactTicket}
+			/>
+			<ContactModalForGroup
+				open={contactModalForGroupOpen}
+				initialValues={newContactForGroup}
+				onClose={handleCloseContactForGroupModal}
+				onSave={handleListSelectd}
 			/>
 			<ContactModal
 				open={contactModalOpen}
@@ -266,68 +291,86 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 					) 
 					: (
 						<>
-							<DialogContent dividers>
-							<Autocomplete
-								options={options}
-								loading={loading}
-								style={{ width: 300 }}
-								clearOnBlur
-								autoHighlight
-								freeSolo
-								clearOnEscape
-								getOptionLabel={renderOptionLabel}
-								renderOption={renderOption}
-								// filterOptions={createAddContactOption}
-								onChange={(e, newValue) => handleListSelectd(e, newValue)}
-								renderInput={params => (
-									<TextField
-										{...params}
-										label={i18n.t("newTicketModal.fieldLabel")}
-										variant="outlined"
-										autoFocus
-										onChange={e => setSearchParam(e.target.value)}
-										onKeyPress={e => {
-											if (loading || !selectedContact) return;
-											else if (e.key === "Enter") {
-												handleSaveTicket(selectedContact.id);
-											}
+							<div style={ { display: openTextBox ? 'none' : 'flex', alignItems: 'center', flexDirection: 'column' } }>
+								<AddIcon
+									onClick={() => setOpenTextBox(true)}
+									onMouseEnter={() => setIsHovering(true)}
+									onMouseLeave={() => setIsHovering(false)}
+									style={ { display: openTextBox && 'none', cursor: isHovering && 'pointer' } }
+								/>
+								<p style={ { display: openTextBox && 'none' } }>total adicionado: {listSelectd.length}</p>
+							</div>
+						  {openTextBox && (
+								<>
+									<DialogContent 
+									  dividers
+									>
+									<Autocomplete
+										options={options}
+										loading={loading}
+										style={{ width: 300 }}
+										clearOnBlur
+										autoHighlight
+										freeSolo
+										clearOnEscape
+										getOptionLabel={renderOptionLabel}
+										renderOption={renderOption}
+										filterOptions={createAddContactOption}
+										onChange={(e, newValue) => {
+											handleListSelectd(e, newValue)
+											setOpenTextBox(false);
 										}}
-										InputProps={{
-											...params.InputProps,
-											endAdornment: (
-												<React.Fragment>
-													{loading ? (
-														<CircularProgress color="inherit" size={20} />
-													) : null}
-													{params.InputProps.endAdornment}
-												</React.Fragment>
-											),
-										}}
+										renderInput={params => (
+											<TextField
+												{...params}
+												label={i18n.t("newTicketModal.fieldLabel")}
+												variant="outlined"
+												autoFocus
+												onChange={e => setSearchParam(e.target.value) }
+												onKeyPress={e => {
+													if (loading || !selectedContact) return;
+													else if (e.key === "Enter") {
+														handleSaveTicket(selectedContact.id);
+													}
+												}}
+												InputProps={{
+													...params.InputProps,
+													endAdornment: (
+														<React.Fragment>
+															{loading ? (
+																<CircularProgress color="inherit" size={20} />
+															) : null}
+															{params.InputProps.endAdornment}
+														</React.Fragment>
+													),
+												}}
+											/>
+										)}
 									/>
-								)}
-							/>
-						<p>total adicionado: {listSelectd.length}</p>
-						</DialogContent>
+									<p>total adicionado: {listSelectd.length}</p>
+								</DialogContent>
+						</>
+						)}
 						<DialogActions>
-							<Button
-								onClick={handleClose}
-								color="secondary"
-								disabled={loading}
-								variant="outlined"
-							>
-								{i18n.t("newTicketModal.buttons.cancel")}
-							</Button>
-							<ButtonWithSpinner
-								variant="contained"
-								type="button"
-								disabled={!listSelectd.length > 0}
-								onClick={() => setGroupModalOpen(true)}
-								color="primary"
-								loading={loading}
-							>
-								Próximo
-							</ButtonWithSpinner>
-						</DialogActions>
+						<Button
+							onClick={handleClose}
+							color="secondary"
+							disabled={loading}
+							variant="outlined"
+						>
+							{i18n.t("newTicketModal.buttons.cancel")}
+						</Button>
+						<ButtonWithSpinner
+							variant="contained"
+							type="button"
+							disabled={!listSelectd.length > 0}
+							onClick={() => setGroupModalOpen(true)}
+							color="primary"
+							loading={loading}
+						>
+							Avançar
+						</ButtonWithSpinner>
+					</DialogActions>
 					</>
 				)}
 			</Dialog>
