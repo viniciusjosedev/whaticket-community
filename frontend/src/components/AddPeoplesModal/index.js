@@ -83,6 +83,7 @@ const AddPeoplesModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) => 
 		setListSelectd([])
 		onClose();
 		setSearchParam("");
+		setOpenTextBox(false);
 	};
 
 	const handleAdd = async () => {
@@ -267,7 +268,7 @@ const AddPeoplesModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) => 
 							disabled={ loading || !listSelectd.length > 0 }
 							loading={loading}
 						>
-							Concluir
+							Adicionar
 						</ButtonWithSpinner>
 					</DialogActions>
 			</Dialog>

@@ -15,6 +15,8 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 
 import { toast } from "react-toastify";
 
+import RemoveIcon from "@material-ui/icons/Add";
+
 import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import ButtonWithSpinner from "../ButtonWithSpinner";
@@ -29,6 +31,8 @@ const DeletePeoplesModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) 
 	const [options, setOptions] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [searchParam, setSearchParam] = useState("");
+	const [openTextBox, setOpenTextBox] = useState(false);
+	const [isHovering, setIsHovering] = useState(false);
 	const [listSelectd, setListSelectd] = useState([])
 	// console.log(listSelectd)
 	const numberOfGroup = history.location.pathname.split('/')[2];
@@ -41,32 +45,40 @@ const DeletePeoplesModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) 
 		setLoading(true);
 		const delayDebounceFn = setTimeout(() => {
 			const fetchMembers = async () => {
-				const { data } = await api.get("contacts", {
-					params: { searchParam },
-				});
-				let contacts;
-				if (data.contacts.length === 0) {
-					setOptions([]);
-					setLoading(false);
-					return;
-				}	else {contacts = data.contacts}
+
+				setOptions([]);
+
+				const { data: { contacts } } = await api.get("contacts")
+				
 				const { data: { contact: { number } } } = await api.get(`/tickets/${numberOfGroup}`)
 				const { data: { groupMetadata: { participants } } } = await api.get(`/group/${number}@g.us`)
+				const { data: { user } } = await api.get('/group/info');
+				
+				// console.log(participants);
 				// console.log(contacts)
-				// console.log(participants)
-				const filter = participants.filter((e, i) => Number(e.id.user) === Number(contacts[i > contacts.length - 1 ? contacts.length - 1 : i].number));
-				// console.log(filter);
-				let filter2 = []
-				filter.forEach(e => {
-					filter2.push(e.id.user);
-				})
-				let filter3 = contacts.filter(e => filter2.includes(e.number));
-				// console.log(filter3);
-				if (listSelectd.length > 0) {
-					filter3 = filter3.filter((e, i) => !listSelectd.includes(`${e.number}@c.us`));
-				}
-				// console.log(filter3);
-				setOptions(filter3);
+
+				let arrayOfParticipants = participants.map(e => e.id.user);
+				arrayOfParticipants = arrayOfParticipants.filter(e => Number(e) !== Number(user));
+
+				const filterContactInGroup = arrayOfParticipants.filter(e => {
+					const verification = contacts.some(i => Number(i.number) === Number(e));
+					return verification;
+				});
+				
+				const filterNumbersWithoutContact = arrayOfParticipants.filter(e => {
+					const verification = filterContactInGroup.some(i => Number(i) === Number(e));
+					return !verification;
+				});
+
+				// console.log(filterNumbersWithoutContact);
+
+				const filterAll = [ ...contacts.filter(e => filterContactInGroup.includes(e.number)),
+				  ...filterNumbersWithoutContact.map(e => {
+						return { name: e, number: e }
+					}) 
+				];
+
+				setOptions(filterAll);
 				setLoading(false);
 			};
 
@@ -79,6 +91,8 @@ const DeletePeoplesModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) 
 		setListSelectd([])
 		onClose();
 		setSearchParam("");
+		setOptions([]);
+		setOpenTextBox(false);
 	};
 
 	const handleExpulse = async () => {
@@ -87,57 +101,82 @@ const DeletePeoplesModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) 
 			chatID: `${number}@g.us`,
 			peoples: listSelectd
 		})
-		toast.success('Pessoas expulsas!')
+		toast.success('Pessoa(s) expulsa(s)!')
 		setListSelectd([]);
+		setOptions([]);
 		handleClose();
 	}
 
 	const handleListSelectd = (e, newValue) => {
-		if (newValue?.number && !listSelectd.some(e => e === `${newValue.number}@c.us`)) {
-			// console.log(!listSelectd.some(e => e === `${newValue.number}@c.us`))
-			setListSelectd([...listSelectd, `${newValue.number}@c.us`]);
+		if (newValue?.number) {
+			const find = listSelectd.find(e => e.includes(newValue.number))
+			if(find) {
+				toast.error('Este contato já está na lista de remoção');
+				setSearchParam("");
+				setOptions([]);
+			} else {
+				toast.success('Contato adicionado a lista de remoção');
+				setSearchParam("");
+			  setListSelectd([...listSelectd, `${newValue.number}@c.us`]);
+				setOptions([]);
+			}
 		}
 	}
+
 	return (
 		<Dialog open={modalOpen} onClose={handleClose} maxWidth="lg" scroll="paper">
 				<DialogTitle id="form-dialog-title">
 					Remover pessoas
 				</DialogTitle>
-				<DialogContent dividers>
-					<Autocomplete
-						style={{ width: 300, marginBottom: 20 }}
-						getOptionLabel={option => `${option.name}`}	
-						onChange={(_e, newValue) => handleListSelectd(_e, newValue)}
-						options={options}
-						filterOptions={filterOptions}
-						freeSolo
-						autoHighlight
-						noOptionsText={i18n.t("transferTicketModal.noOptions")}
-						loading={loading}
-						renderInput={params => (
-							<TextField
-								{...params}
-								label={i18n.t("transferTicketModal.fieldLabel")}
-								variant="outlined"
-								required
-								autoFocus
-								onChange={e => setSearchParam(e.target.value)}
-								InputProps={{
-									...params.InputProps,
-									endAdornment: (
-										<React.Fragment>
-											{loading ? (
-												<CircularProgress color="inherit" size={20} />
-											) : null}
-											{params.InputProps.endAdornment}
-										</React.Fragment>
-									),
-								}}
-							/>
-						)}
-					/>
-					<p>Total selecionado: {listSelectd.length}</p>
-				</DialogContent>
+				<div style={ { display: openTextBox ? 'none' : 'flex', alignItems: 'center', flexDirection: 'column' } }>
+						<RemoveIcon
+							onClick={() => setOpenTextBox(true)}
+							onMouseEnter={() => setIsHovering(true)}
+							onMouseLeave={() => setIsHovering(false)}
+							style={ { display: openTextBox && 'none', cursor: isHovering && 'pointer' } }
+						/>
+						<p style={ { display: openTextBox && 'none' } }>total adicionado: {listSelectd.length}</p>
+				</div>
+				{openTextBox && (
+					<DialogContent dividers>
+						<Autocomplete
+							style={{ width: 300, marginBottom: 20 }}
+							getOptionLabel={option => `${option.name} - ${option.number}`}	
+							onChange={(_e, newValue) => {
+								handleListSelectd(_e, newValue)
+								setOpenTextBox(false);
+							}}
+							options={options}
+							filterOptions={filterOptions}
+							freeSolo
+							autoHighlight
+							noOptionsText={i18n.t("transferTicketModal.noOptions")}
+							loading={loading}
+							renderInput={params => (
+								<TextField
+									{...params}
+									label={i18n.t("transferTicketModal.fieldLabel")}
+									variant="outlined"
+									required
+									autoFocus
+									onChange={e => setSearchParam(e.target.value)}
+									InputProps={{
+										...params.InputProps,
+										endAdornment: (
+											<React.Fragment>
+												{loading ? (
+													<CircularProgress color="inherit" size={20} />
+												) : null}
+												{params.InputProps.endAdornment}
+											</React.Fragment>
+										),
+									}}
+								/>
+							)}
+						/>
+						<p>Total selecionado: {listSelectd.length}</p>
+					</DialogContent>
+				)}
 				<DialogActions>
 					<Button
 						onClick={handleClose}
