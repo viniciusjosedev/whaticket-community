@@ -189,7 +189,7 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 						handleOpenSelectAdminModal()
 						alertWarning();
 					}}>
-						Tornas pessoas admins
+						Tornar pessoas admins
 					</MenuItem>
 				)}
 				{isAdmin && (
