@@ -89,6 +89,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 		setSearchParam("");
 		setSelectedContact(null);
 		setListSelectd([]);
+		setOpenTextBox(false);
 	};
 
 	const handleSaveTicket = async contactId => {
@@ -150,6 +151,7 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 
 	const handleCloseGroupModal = () => {
 		setGroupModalOpen(false);
+		handleClose();
 	};
 
 	const handleAddNewContactTicket = contact => {
@@ -214,14 +216,14 @@ const NewTicketModal = ({ modalOpen, onClose }) => {
 							setListSelectd([])
 							setChoiceInput('ticket')
 						}}
-						style={ { cursor: 'pointer' } }
+						style={ { cursor: 'pointer', color: choiceInput === 'group' ? 'gray' : 'black' } }
 						id="form-dialog-title"
 					>
 						{i18n.t("newTicketModal.title")}
 					</DialogTitle>
 					<DialogTitle 
 						id="form-dialog-title"
-						style={ { cursor: 'pointer' } }
+						style={ { cursor: 'pointer', color: choiceInput === 'ticket' ? 'gray' : 'black' } }
 						onClick={() => {
 							setOptions([]);
 							setChoiceInput('group')

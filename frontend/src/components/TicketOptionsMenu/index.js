@@ -43,14 +43,14 @@ const TicketOptionsMenu = ({ ticket, menuOpen, handleClose, anchorEl }) => {
 			try {
 				if (ticket.isGroup) {
 					const { data: { user } } = await api.get('/group/info');
-					// console.log(user)
 					const { data: { groupMetadata: { participants } } } = await api.get(`/group/${ticket.contact.number}@g.us`)
+					console.log(user, participants)
 					const find = participants.find(e => e.isSuperAdmin)
 					if (Number(user) === Number(find.id.user)) setIsAdmin(true);
 				}
 			} catch (error) {
-				await api.delete(`/tickets/${ticket.id}`);
-				history.push('/tickets')
+				toast.error('Você ainda nao está autenticado ou o grupo não existe mais!');
+				history.push('/tickets');
 			}
 		}
 		init();

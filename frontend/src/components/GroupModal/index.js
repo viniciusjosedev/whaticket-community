@@ -92,11 +92,16 @@ const GroupModal = ({ open, onClose, contactId, initialValues, onSave }) => {
 				integer,
 				isGroup
 			});
-			// console.log(create);
-			setLoading(false);
-			onSave(create.data)
-			toast.success('Grupo criado!')
-			onClose();
+			if(create.data.type === 'ERROR') {
+				toast.error('Algo deu errado! Verifique o(s) número(s)!')
+				setLoading(false);
+				handleClose();
+			} else {
+				setLoading(false);
+				onSave(create.data)
+				toast.success('Grupo criado!')
+				handleClose();
+		}
 		}
 		catch (error) {
 			console.log(error.message)

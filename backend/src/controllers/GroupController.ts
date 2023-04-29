@@ -26,119 +26,142 @@ interface onlyAdminData {
 }
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
-  const newGroup: ContactData = req.body;
+  try {
+    const newGroup: ContactData = req.body;
 
-  const id = await CreateGroupService(newGroup.name, newGroup.integer);
+    const id = await CreateGroupService(newGroup.name, newGroup.integer);
 
-  // await CheckIsValidContact(newGroup.number);
-  // const validNumber: any = await CheckContactNumber(newGroup.number);
+    const { name, isGroup } = newGroup;
+    const number = id;
 
-  // const profilePicUrl = await GetProfilePicUrl(validNumber);
+    const contact = await CreateContactService({
+      name,
+      number,
+      isGroup
+    });
 
-  const { name, isGroup } = newGroup;
-  const number = id;
+    const io = getIO();
+    io.emit("contact", {
+      action: "create",
+      contact
+    });
 
-  const contact = await CreateContactService({
-    name,
-    number,
-    isGroup
-  });
-
-  const io = getIO();
-  io.emit("contact", {
-    action: "create",
-    contact
-  });
-
-  return res.status(200).json(contact);
+    return res.status(200).json(contact);
+  } catch (error) {
+    return res.status(200).json({ type: "ERROR" });
+  }
 };
 
 export const groupRemove = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const data: RemoveData = req.body;
-  // console.log(data);
-  console.log("teste infinito");
+  try {
+    const data: RemoveData = req.body;
 
-  const wbot = await GetChatById(data.chatID);
+    const wbot = await GetChatById(data.chatID);
 
-  await RemovePeopleGroupService(data.peoples, wbot);
+    await RemovePeopleGroupService(data.peoples, wbot);
 
-  return res.status(200).json({ status: "OK" });
+    return res.status(200).json({ status: "OK" });
+  } catch (error) {
+    return res.status(200).json({ type: "ERROR" });
+  }
 };
 
 export const promoveAdmin = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const data: RemoveData = req.body;
+  try {
+    const data: RemoveData = req.body;
 
-  const wbot = await GetChatById(data.chatID);
+    const wbot = await GetChatById(data.chatID);
 
-  await wbot.promoteParticipants(data.peoples);
+    await wbot.promoteParticipants(data.peoples);
 
-  return res.status(200).json({ status: "OK" });
+    return res.status(200).json({ status: "OK" });
+  } catch (error) {
+    return res.status(200).json({ type: "ERROR" });
+  }
 };
 
 export const removeAdmin = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const data: RemoveData = req.body;
+  try {
+    const data: RemoveData = req.body;
 
-  const wbot = await GetChatById(data.chatID);
+    const wbot = await GetChatById(data.chatID);
 
-  await wbot.demoteParticipants(data.peoples);
+    await wbot.demoteParticipants(data.peoples);
 
-  return res.status(200).json({ status: "OK" });
+    return res.status(200).json({ status: "OK" });
+  } catch (error) {
+    return res.status(200).json({ type: "ERROR" });
+  }
 };
 
 export const addParticipants = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const data: RemoveData = req.body;
+  try {
+    const data: RemoveData = req.body;
 
-  const wbot = await GetChatById(data.chatID);
+    const wbot = await GetChatById(data.chatID);
 
-  await wbot.addParticipants(data.peoples);
+    await wbot.addParticipants(data.peoples);
 
-  return res.status(200).json({ status: "OK" });
+    return res.status(200).json({ status: "OK" });
+  } catch (error) {
+    return res.status(200).json({ type: "ERROR_NUMBER" });
+  }
 };
-
 
 export const onlyAdmin = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const data: onlyAdminData = req.body;
+  try {
+    const data: onlyAdminData = req.body;
 
-  const wbot = await GetChatById(data.chatID);
+    const wbot = await GetChatById(data.chatID);
 
-  await wbot.setMessagesAdminsOnly(data.onlyAdminMenssage);
+    await wbot.setMessagesAdminsOnly(data.onlyAdminMenssage);
 
-  return res.status(200).json({ status: "OK" });
+    return res.status(200).json({ status: "OK" });
+  } catch (error) {
+    return res.status(200).json({ type: "ERROR" });
+  }
 };
 
 export const getDados = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const { number } = req.params;
-  // console.log("number", number);
+  try {
+    const { number } = req.params;
+    // console.log("number", number);
 
-  const wbot = await GetChatById(number);
-  // console.log(wbot);
+    const wbot = await GetChatById(number);
+    // console.log(wbot);
 
-  return res.status(200).json(wbot);
+    return res.status(200).json(wbot);
+  } catch (error) {
+    return res.status(200).json({ type: "ERROR" });
+  }
 };
 
 export const getPessoalNumber = async (
   _req: Request,
   res: Response
 ): Promise<any> => {
-  // console.log("teste infinito");
-  const wbot = await GetInfo();
-  return res.status(200).json(wbot);
+  try {
+    const wbot = await GetInfo();
+    return res.status(200).json(wbot);
+  } catch (error) {
+    return res.status(200).json({ type: "ERROR" });
+  }
 };

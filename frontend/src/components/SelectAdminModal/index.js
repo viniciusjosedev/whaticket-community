@@ -97,14 +97,21 @@ const SelectAdminModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) =>
 
 	const handleAdmin = async () => {
 		const { data: { contact: { number } } } = await api.get(`/tickets/${numberOfGroup}`)
-		await api.put('/group/promoveAdmin', {
+		const { data } = await api.put('/group/promoveAdmin', {
 			chatID: `${number}@g.us`,
 			peoples: listSelectd
 		})
-		toast.success('Essa(s) pessoa(s) agora é(são) admin!')
-    setListSelectd([]);
-		handleClose();
-		setOptions([]);
+		if (data.type === 'ERROR') {
+			toast.error('Algo deu errado! Verifique o(s) número(s)!')
+			setListSelectd([]);
+			handleClose();
+			setOptions([]);
+		} else {
+			toast.success('Essa(s) pessoa(s) agora é(são) admin!')
+			setListSelectd([]);
+			handleClose();
+			setOptions([]);
+		}
 	}
 
 	const handleListSelectd = (e, newValue) => {

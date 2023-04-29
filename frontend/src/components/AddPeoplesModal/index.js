@@ -92,7 +92,6 @@ const AddPeoplesModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) => 
 			chatID: `${number}@g.us`,
 			peoples: listSelectd
 		});
-		// console.log(data)
 		if (data.type === 'ERROR_NUMBER') {
 			toast.error('Algo deu errado! Verifique o(s) número(s)!')
 			setListSelectd([]);
@@ -164,6 +163,7 @@ const AddPeoplesModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) => 
 
 	const handleSaveTicket = async contactId => {
 		if (!contactId) return;
+		console.log('passou por aqui');
 		setLoading(true);
 		try {
 			const { data: ticket } = await api.post("/tickets", {

@@ -97,14 +97,21 @@ const RemoveAdminModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) =>
 
 	const handleAdmin = async () => {
 		const { data: { contact: { number } } } = await api.get(`/tickets/${numberOfGroup}`)
-		await api.put('/group/removeAdmin', {
+		const { data } = await api.put('/group/removeAdmin', {
 			chatID: `${number}@g.us`,
 			peoples: listSelectd
 		})
-		toast.success('Essa(s) pessoa(s) deixou(deixaram) de ser admin!')
-    setListSelectd([]);
-		setOptions([]);
-		handleClose();
+		if (data.type === 'ERROR') {
+			toast.error('Algo deu errado! Verifique o(s) número(s)!')
+			setListSelectd([]);
+			handleClose();
+			setOptions([]);
+		} else {
+			toast.success('Essa(s) pessoa(s) deixou(deixaram) de ser admin!')
+			setListSelectd([]);
+			setOptions([]);
+			handleClose();
+		}
 	}
 
 	const handleListSelectd = (e, newValue) => {

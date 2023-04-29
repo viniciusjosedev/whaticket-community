@@ -82,7 +82,6 @@ const Ticket = () => {
   const [loading, setLoading] = useState(true);
   const [contact, setContact] = useState({});
   const [ticket, setTicket] = useState({});
-	const [isGroup, setIsGroup] = useState(false);
 
   useEffect(() => {
     setLoading(true);

@@ -88,7 +88,7 @@ const DeletePeoplesModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) 
 	}, [searchParam, modalOpen]);
 
 	const handleClose = () => {
-		setListSelectd([])
+		setListSelectd([]);
 		onClose();
 		setSearchParam("");
 		setOptions([]);
@@ -97,14 +97,20 @@ const DeletePeoplesModal = ({ modalOpen, onClose, ticketid, ticketWhatsappId }) 
 
 	const handleExpulse = async () => {
 		const { data: { contact: { number } } } = await api.get(`/tickets/${numberOfGroup}`)
-		await api.put('/group/remove', {
+		const { data } =  await api.put('/group/remove', {
 			chatID: `${number}@g.us`,
 			peoples: listSelectd
 		})
-		toast.success('Pessoa(s) expulsa(s)!')
-		setListSelectd([]);
-		setOptions([]);
-		handleClose();
+		if (data.type === 'ERROR') {
+			toast.error('Algo deu errado! Verifique o(s) número(s)!')
+			setListSelectd([]);
+			handleClose();
+		}	else {
+			toast.success('Pessoa(s) expulsa(s)!')
+			setListSelectd([]);
+			setOptions([]);
+			handleClose();
+	  }
 	}
 
 	const handleListSelectd = (e, newValue) => {
