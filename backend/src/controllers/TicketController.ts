@@ -78,6 +78,7 @@ export const show = async (req: Request, res: Response): Promise<Response> => {
   const { ticketId } = req.params;
 
   const contact = await ShowTicketService(ticketId);
+  // console.log(contact);
 
   return res.status(200).json(contact);
 };
@@ -119,13 +120,10 @@ export const remove = async (
   const ticket = await DeleteTicketService(ticketId);
 
   const io = getIO();
-  io.to(ticket.status)
-    .to(ticketId)
-    .to("notification")
-    .emit("ticket", {
-      action: "delete",
-      ticketId: +ticketId
-    });
+  io.to(ticket.status).to(ticketId).to("notification").emit("ticket", {
+    action: "delete",
+    ticketId: +ticketId
+  });
 
   return res.status(200).json({ message: "ticket deleted" });
 };

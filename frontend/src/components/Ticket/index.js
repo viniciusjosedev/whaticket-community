@@ -89,7 +89,10 @@ const Ticket = () => {
       const fetchTicket = async () => {
         try {
           const { data } = await api.get("/tickets/" + ticketId);
-
+					// console.log(data)
+					// if (data.isGroup) {
+					// 	setIsGroup(true);
+					// }
           setContact(data.contact);
           setTicket(data);
           setLoading(false);
