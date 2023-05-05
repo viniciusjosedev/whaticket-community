@@ -17,6 +17,8 @@ interface Request {
   userId: string;
   withUnreadMessages?: string;
   queueIds: number[];
+  order: string;
+  column: string;
 }
 
 interface Response {
@@ -33,7 +35,9 @@ const ListTicketsService = async ({
   date,
   showAll,
   userId,
-  withUnreadMessages
+  withUnreadMessages,
+  order,
+  column
 }: Request): Promise<Response> => {
   let whereCondition: Filterable["where"] = {
     [Op.or]: [{ userId }, { status: "pending" }],
@@ -141,7 +145,7 @@ const ListTicketsService = async ({
     distinct: true,
     limit,
     offset,
-    order: [["updatedAt", "DESC"]]
+    order: [[column || "updatedAt", order || "ASC"]]
   });
 
   const hasMore = count > offset + tickets.length;

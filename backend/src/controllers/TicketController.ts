@@ -18,6 +18,8 @@ type IndexQuery = {
   showAll: string;
   withUnreadMessages: string;
   queueIds: string;
+  order: string;
+  column: string;
 };
 
 interface TicketData {
@@ -25,6 +27,7 @@ interface TicketData {
   status: string;
   queueId: number;
   userId: number;
+  order: string;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -35,7 +38,9 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     searchParam,
     showAll,
     queueIds: queueIdsStringified,
-    withUnreadMessages
+    withUnreadMessages,
+    order,
+    column
   } = req.query as IndexQuery;
 
   const userId = req.user.id;
@@ -54,7 +59,9 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
     showAll,
     userId,
     queueIds,
-    withUnreadMessages
+    withUnreadMessages,
+    order,
+    column
   });
 
   return res.status(200).json({ tickets, count, hasMore });
@@ -119,13 +126,10 @@ export const remove = async (
   const ticket = await DeleteTicketService(ticketId);
 
   const io = getIO();
-  io.to(ticket.status)
-    .to(ticketId)
-    .to("notification")
-    .emit("ticket", {
-      action: "delete",
-      ticketId: +ticketId
-    });
+  io.to(ticket.status).to(ticketId).to("notification").emit("ticket", {
+    action: "delete",
+    ticketId: +ticketId
+  });
 
   return res.status(200).json({ message: "ticket deleted" });
 };

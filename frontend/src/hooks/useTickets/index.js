@@ -12,6 +12,8 @@ const useTickets = ({
     showAll,
     queueIds,
     withUnreadMessages,
+		order,
+		column
 }) => {
     const [loading, setLoading] = useState(true);
     const [hasMore, setHasMore] = useState(false);
@@ -32,10 +34,11 @@ const useTickets = ({
                             showAll,
                             queueIds,
                             withUnreadMessages,
+														order,
+														column
                         },
                     })
                     setTickets(data.tickets)
-
                     let horasFecharAutomaticamente = getHoursCloseTicketsAuto(); 
 
                     if (status === "open" && horasFecharAutomaticamente && horasFecharAutomaticamente !== "" &&
@@ -43,7 +46,6 @@ const useTickets = ({
 
                         let dataLimite = new Date()
                         dataLimite.setHours(dataLimite.getHours() - Number(horasFecharAutomaticamente))
-
                         data.tickets.forEach(ticket => {
                             if (ticket.status !== "closed") {
                                 let dataUltimaInteracaoChamado = new Date(ticket.updatedAt)
@@ -80,6 +82,7 @@ const useTickets = ({
         showAll,
         queueIds,
         withUnreadMessages,
+				order,
     ])
 
     return { tickets, loading, hasMore, count };

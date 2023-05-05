@@ -74,19 +74,18 @@ const useStyles = makeStyles(theme => ({
 const reducer = (state, action) => {
 	if (action.type === "LOAD_TICKETS") {
 		const newTickets = action.payload;
+		state = [];
 
 		newTickets.forEach(ticket => {
-			const ticketIndex = state.findIndex(t => t.id === ticket.id);
-			if (ticketIndex !== -1) {
-				state[ticketIndex] = ticket;
-				if (ticket.unreadMessages > 0) {
-					state.unshift(state.splice(ticketIndex, 1)[0]);
-				}
-			} else {
-				state.push(ticket);
-			}
+			// const ticketIndex = state.findIndex(t => t.id === ticket.id);
+			// if (ticketIndex !== -1) {
+			// 	state[ticketIndex] = ticket;
+			// 	if (ticket.unreadMessages > 0) {
+			// 		state.unshift(state.splice(ticketIndex, 1)[0]);
+			// 	}
+			// } else {
+			state.push(ticket);
 		});
-
 		return [...state];
 	}
 
@@ -153,23 +152,28 @@ const reducer = (state, action) => {
 };
 
 	const TicketsList = (props) => {
-		const { status, searchParam, showAll, selectedQueueIds, updateCount, style } =
+		const { status, searchParam, showAll, selectedQueueIds, updateCount, style, 
+			orderAtendendo, orderAguardando } =
 			props;
 	const classes = useStyles();
 	const [pageNumber, setPageNumber] = useState(1);
 	const [ticketsList, dispatch] = useReducer(reducer, []);
 	const { user } = useContext(AuthContext);
 
+	const getLocalStorage = localStorage.getItem('prefUserSelect') || 'updatedAt'
+
 	useEffect(() => {
 		dispatch({ type: "RESET" });
 		setPageNumber(1);
 	}, [status, searchParam, dispatch, showAll, selectedQueueIds]);
 
-	const { tickets, hasMore, loading } = useTickets({
+	const { tickets, loading, hasMore } = useTickets({
 		pageNumber,
 		searchParam,
 		status,
 		showAll,
+		order: orderAtendendo || orderAguardando,
+		column: getLocalStorage,
 		queueIds: JSON.stringify(selectedQueueIds),
 	});
 
@@ -290,7 +294,7 @@ const reducer = (state, action) => {
 					) : (
 						<>
 							{ticketsList.map(ticket => (
-								<TicketListItem ticket={ticket} key={ticket.id} />
+								<TicketListItem ticket={ticket} key={ticket.id} column={getLocalStorage}/>
 							))}
 						</>
 					)}
