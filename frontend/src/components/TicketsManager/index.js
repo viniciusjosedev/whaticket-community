@@ -3,6 +3,8 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import SearchIcon from "@material-ui/icons/Search";
+import ArrowUp from "@material-ui/icons/ArrowDropUp";
+import ArrowDown from "@material-ui/icons/ArrowDropDown";
 import InputBase from "@material-ui/core/InputBase";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
@@ -98,6 +100,11 @@ const TicketsManager = () => {
   const [tab, setTab] = useState("open");
   const [tabOpen, setTabOpen] = useState("open");
   const [newTicketModalOpen, setNewTicketModalOpen] = useState(false);
+
+	const [arrowAtendendo, setArrowAtentendo] = useState('ASC');
+	const [arrowAguardando, setArrowAguardando] = useState('ASC');
+	// console.log(arrowAtendendo, arrowAguardando)
+
   const [showAllTickets, setShowAllTickets] = useState(false);
   const searchInputRef = useRef();
   const { user } = useContext(AuthContext);
@@ -249,6 +256,7 @@ const TicketsManager = () => {
           variant="fullWidth"
         >
           <Tab
+						onClick={ () => setArrowAtentendo(arrowAtendendo === 'ASC' ? 'DESC' : 'ASC') }
             label={
               <Badge
                 className={classes.badge}
@@ -256,11 +264,16 @@ const TicketsManager = () => {
                 color="primary"
               >
                 {i18n.t("ticketsList.assignedHeader")}
+								{arrowAtendendo === 'ASC' ? 
+									<ArrowUp/> : 
+									<ArrowDown/>
+								}
               </Badge>
             }
             value={"open"}
           />
           <Tab
+					  onClick={ () => setArrowAguardando(arrowAguardando === 'ASC' ? 'DESC' : 'ASC') }
             label={
               <Badge
                 className={classes.badge}
@@ -268,22 +281,28 @@ const TicketsManager = () => {
                 color="secondary"
               >
                 {i18n.t("ticketsList.pendingHeader")}
+								{arrowAguardando === 'ASC' ? 
+									<ArrowUp/> : 
+									<ArrowDown/>
+								}
               </Badge>
             }
             value={"pending"}
           />
         </Tabs>
         <Paper className={classes.ticketsWrapper}>
-          <TicketsList
-            status="open"
-            showAll={showAllTickets}
-            selectedQueueIds={selectedQueueIds}
-            updateCount={(val) => setOpenCount(val)}
-            style={applyPanelStyle("open")}
-          />
+					<TicketsList
+						status="open"
+						showAll={showAllTickets}
+						selectedQueueIds={selectedQueueIds}
+						updateCount={(val) => setOpenCount(val)}
+						orderAtendendo={arrowAtendendo}
+						style={applyPanelStyle("open")}
+					/>
           <TicketsList
             status="pending"
             selectedQueueIds={selectedQueueIds}
+						orderAguardando={arrowAguardando}
             updateCount={(val) => setPendingCount(val)}
             style={applyPanelStyle("pending")}
           />

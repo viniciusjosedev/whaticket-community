@@ -41,6 +41,8 @@ const Settings = () => {
 	const classes = useStyles();
 
 	const [settings, setSettings] = useState([]);
+	const getLocalStorage = localStorage.getItem('prefUserSelect') || 'updatedAt';
+	const [select, setSelect] = useState(getLocalStorage);
 
 	useEffect(() => {
 		const fetchSession = async () => {
@@ -87,6 +89,11 @@ const Settings = () => {
 		}
 	};
 
+	const handleSelect = ( { target: { value } } ) => {
+		setSelect(value);
+		localStorage.setItem('prefUserSelect', value)
+	}
+
 	const getSettingValue = key => {
 		const { value } = settings.find(s => s.key === key);
 		return value;
@@ -121,7 +128,30 @@ const Settings = () => {
 							{i18n.t("settings.settings.userCreation.options.disabled")}
 						</option>
 					</Select>
+				</Paper>
 
+
+				<Paper className={classes.paper}>
+					<Typography variant="body1">
+							Dada e horário visual dos tickets por
+					</Typography>
+					<Select
+						margin="dense"
+						variant="outlined"
+						native
+						id="userCreation-setting"
+						name="userCreation"
+						value={select}
+						className={classes.settingOption}
+						onChange={handleSelect}
+					>
+						<option value="createdAt">
+							Criação do ticket
+						</option>
+						<option value="updatedAt">
+							Última mensagem
+						</option>
+					</Select>
 				</Paper>
 
 				<Paper className={classes.paper}>

@@ -116,7 +116,7 @@ const useStyles = makeStyles(theme => ({
 	},
 }));
 
-const TicketListItem = ({ ticket }) => {
+const TicketListItem = ({ ticket, column }) => {
 	const classes = useStyles();
 	const history = useHistory();
 	const [loading, setLoading] = useState(false);
@@ -204,10 +204,10 @@ const TicketListItem = ({ ticket }) => {
 									variant="body2"
 									color="textSecondary"
 								>
-									{isSameDay(parseISO(ticket.updatedAt), new Date()) ? (
-										<>{format(parseISO(ticket.updatedAt), "HH:mm")}</>
+									{isSameDay(parseISO(column === 'updatedAt' ? ticket.updatedAt : ticket.createdAt), new Date()) ? (
+										<>{format(parseISO(column === 'updatedAt' ? ticket.updatedAt : ticket.createdAt), "HH:mm")}</>
 									) : (
-										<>{format(parseISO(ticket.updatedAt), "dd/MM/yyyy")}</>
+										<>{format(parseISO(column === 'updatedAt' ? ticket.updatedAt : ticket.createdAt), "dd/MM/yyyy")}</>
 									)}
 								</Typography>
 							)}
